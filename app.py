@@ -107,7 +107,7 @@ def ajouter_categorie():
         conn.execute("INSERT INTO categories (nom) VALUES (?)", (nom,))
         conn.commit()
         conn.close()
-        return redirect("/ajouter_categorie")
+        return redirect("/categories")
     return render_template("ajouter_categorie.html")
 
 @app.route("/categories")
