@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <!-- Titre de la page avec un style attrayant -->
+    <h2 class="text-center mb-4">Détails du Client : <strong>{{ client.nom }}</strong></h2>
+
+    <!-- Section d'actions avec des boutons stylisés -->
+    <div class="d-flex justify-content-between mb-4">
+        <a href="{{ url_for('ajouter_recu', client_id=client.id) }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> Nouvelle Transaction
+        </a>
+        <a href="{{ url_for('tous_les_recus', client_id=client.id) }}" class="btn btn-secondary btn-lg">
+            <i class="bi bi-clock-history"></i> Historique des Transactions
+        </a>
+    </div>
+
+    <!-- Détails du client -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h4>Détails du Client</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Nom :</strong> {{ client.nom }}</p>
+            <p><strong>Téléphone :</strong> {{ client.telephone }}</p>
+            <p><strong>Email :</strong> {{ client.email }}</p>
+            <!-- Vous pouvez ajouter d'autres informations du client ici -->
+        </div>
+    </div>
+    
+{% endblock %}

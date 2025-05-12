@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2 class="text-center mb-4 text-primary">
+        {% if client %}
+            Reçus de <strong>{{ client['nom'] }}</strong>
+            <a href="{{ url_for('ajouter_recu') }}?client_id={{ client['id'] }}" class="btn btn-sm btn-success float-end">
+                <i class="bi bi-plus-circle"></i> Ajouter un reçu
+            </a>
+        {% else %}
+            Tous les reçus
+        {% endif %}
+    </h2>
+
+    {% for recu, produits in recus_details %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5>Reçu n°{{ recu['id'] }}</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID Client :</strong> {{ recu['client_id'] }}</p>
+                <p><strong>Nom du client :</strong> {{ recu['nom_client'] or recu['nom_client_temporaire'] }}</p>
+                <p><strong>Solde :</strong> 
+                    <span class="badge {{ 'bg-success' if recu['solde'] else 'bg-warning' }}">
+                        {{ 'Soldé' if recu['solde'] else 'Non soldé' }}
+                    </span>
+                </p>
+                <p><strong>Date du reçu :</strong> {{ recu['date'] }}</p>
+                <p><strong>Total :</strong> <span class="text-success">{{ recu['total'] }} FCFA</span></p>
+
+                <h6 class="mt-4 text-info">Produits associés :</h6>
+                <ul class="list-group mb-3">
+                    {% for produit in produits %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ produit['nom'] }} (x{{ produit['quantite'] }})</span>
+                            <span class="badge bg-info">{{ produit['categorie_nom'] }}</span>
+                            <span>{{ produit['prix_unitaire'] }} FCFA</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="mt-3 d-flex justify-content-between">
+                    <a href="{{ url_for('basculer_solde', recu_id=recu['id']) }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-toggle2-off"></i> Marquer comme {{ 'Non soldé' if recu['solde'] else 'Soldé' }}
+                    </a>
+                    <a href="{{ url_for('imprimer_recu', recu_id=recu['id']) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-printer"></i> Imprimer le reçu
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center text-danger">Aucun reçu trouvé{% if client %} pour ce client{% endif %}.</p>
+    {% endfor %}
+{% endblock %}

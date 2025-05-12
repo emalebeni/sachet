@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card-header text-center bg-dark text-white">
+            <h2>Connexion</h2>
+        </div>
+        <div class="card-body">
+            <!-- Affichage des messages flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {% for category, message in messages %}
+                            <strong>{{ message }}</strong>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('connexion') }}">
+                <!-- Nom d'utilisateur pré-rempli et non modifiable -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nom d'utilisateur</label>
+                    <input type="text" id="username" name="username" class="form-control" value="admin" readonly>
+                </div>
+
+                <!-- Mot de passe -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mot de passe (code)</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1 class="text-center mt-4">Bienvenue dans l'application de gestion des reçus</h1>
+<p class="text-center mb-4">Utilisez les boutons ci-dessous pour naviguer entre les différentes sections.</p>
+
+<div class="container d-flex flex-wrap justify-content-center gap-3">
+
+    <a href="{{ url_for('clients') }}" class="btn btn-primary btn-lg d-flex flex-column align-items-center p-3 shadow">
+        <span class="fs-3">👤</span>
+        <span class="d-none d-md-block">Clients</span>
+    </a>
+
+    <a href="{{ url_for('produits') }}" class="btn btn-success btn-lg d-flex flex-column align-items-center p-3 shadow">
+        <span class="fs-3">📦</span>
+        <span class="d-none d-md-block">Produits</span>
+    </a>
+
+    <a href="{{ url_for('categories') }}" class="btn btn-warning btn-lg d-flex flex-column align-items-center p-3 shadow">
+        <span class="fs-3">🗂️</span>
+        <span class="d-none d-md-block">Catégories</span>
+    </a>
+
+    <a href="{{ url_for('ajouter_recu') }}" class="btn btn-info btn-lg d-flex flex-column align-items-center p-3 shadow text-white">
+        <span class="fs-3">📝</span>
+        <span class="d-none d-md-block">Nouveau Reçu</span>
+    </a>
+
+    <a href="{{ url_for('tous_les_recus') }}" class="btn btn-dark btn-lg d-flex flex-column align-items-center p-3 shadow">
+        <span class="fs-3">📋</span>
+        <span class="d-none d-md-block">Historique</span>
+    </a>
+
+</div>
+{% endblock %}

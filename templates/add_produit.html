@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Ajouter un produit</h2>
+<form method="post">
+    <div class="mb-3">
+        <label for="nom" class="form-label">Nom du produit</label>
+        <input type="text" class="form-control" name="nom" required>
+    </div>
+    <button type="submit" class="btn btn-success">Ajouter</button>
+</form>
+{% endblock %}

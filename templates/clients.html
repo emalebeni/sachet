@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h2 class="text-center mb-4">Liste des Clients</h2>
+    
+    <!-- Bouton d'ajout de client -->
+    <div class="text-end mb-3">
+        <a href="{{ url_for('add_client') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Ajouter un client
+        </a>
+    </div>
+
+    <!-- Table des clients -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nom</th>
+                    <th>Téléphone</th>
+                    <th>Email</th>
+                    <th>Actions</th> <!-- Colonne des actions -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('client_detail', client_id=client.id) }}" class="text-decoration-none">
+                                {{ client.nom }}
+                            </a>
+                        </td>
+                        <td>{{ client.telephone }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>
+                            <a href="{{ url_for('client_detail', client_id=client.id) }}" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i> Voir
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

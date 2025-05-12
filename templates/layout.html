@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion des Reçus{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6f9;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .dropdown-menu a:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">📊 Dashboard</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto">
+                {% if session.get('user_logged_in') %}
+                    <!-- Si l'utilisateur est connecté -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('deconnexion') }}">🔒 Déconnexion</a>
+                    </li>
+                {% else %}
+                    <!-- Si l'utilisateur n'est pas connecté -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('connexion') }}">🔑 Connexion</a>
+                    </li>
+                {% endif %}
+
+                <!-- Menu déroulant -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="menuRecu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Reçus
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuRecu">
+                        <li><a class="dropdown-item" href="{{ url_for('ajouter_recu') }}">📝 Nouveau reçu</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('tous_les_recus') }}">📄 Historique</a></li>
+                    </ul>
+                </li>
+
+                <!-- Lien Clients -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('clients') }}">👥 Clients</a>
+                </li>
+
+                <!-- Lien Produits -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('produits') }}">📦 Produits</a>
+                </li>
+
+                <!-- Lien Catégories -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('categories') }}">🗂️ Catégories</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENU PRINCIPAL -->
+<div class="container mt-4 mb-5">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<!-- FOOTER OPTIONNEL -->
+<footer class="text-center text-muted small pb-3">
+    &copy; {{ current_year or "2025" }} - Application de gestion des reçus
+</footer>
+
+<!-- JS Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
