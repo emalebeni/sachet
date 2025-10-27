@@ -18,6 +18,7 @@
             <!-- Champ masqué pour envoyer la valeur malgré le champ désactivé -->
             <input type="hidden" name="client_id" value="{{ selected_client_id }}">
         {% else %}
+
             <select name="client_id" class="form-select">
                 <option value="">-- Aucun --</option>
                 {% for client in clients %}

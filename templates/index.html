@@ -1,35 +1,357 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h1 class="text-center mt-4">Bienvenue dans l'application de gestion des reçus</h1>
-<p class="text-center mb-4">Utilisez les boutons ci-dessous pour naviguer entre les différentes sections.</p>
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 25px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate-glow 10s linear infinite;
+    }
+    
+    @keyframes rotate-glow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        font-weight: 300;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .dashboard-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+        border-radius: 20px;
+        padding: 35px 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 3px solid transparent;
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .dashboard-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, var(--card-color) 0%, var(--card-color-light) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .dashboard-card:hover::before {
+        opacity: 0.1;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        border-color: var(--card-color);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    
+    .dashboard-card:active {
+        transform: translateY(-5px) scale(1.01);
+    }
+    
+    /* Carte spéciale pour VENTE RAPIDE */
+    .card-vente-rapide {
+        grid-column: span 2;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        min-height: 200px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(40, 167, 69, 0.4);
+        animation: mega-pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes mega-pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 20px 60px rgba(40, 167, 69, 0.4);
+        }
+        50% {
+            transform: scale(1.02);
+            box-shadow: 0 25px 80px rgba(40, 167, 69, 0.6);
+        }
+    }
+    
+    .card-vente-rapide:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 30px 90px rgba(40, 167, 69, 0.7);
+    }
+    
+    .card-vente-rapide::before {
+        display: none;
+    }
+    
+    .card-vente-rapide .card-icon {
+        font-size: 5rem;
+        margin-bottom: 20px;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .card-vente-rapide .card-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .card-vente-rapide .card-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    .card-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover .card-icon {
+        transform: scale(1.2) rotate(10deg);
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .card-vente-rapide .card-title {
+        color: white;
+    }
+    
+    .card-subtitle {
+        font-size: 0.95rem;
+        color: #7f8c8d;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Couleurs par carte */
+    .card-clients { --card-color: #3498db; --card-color-light: #5dade2; }
+    .card-produits { --card-color: #2ecc71; --card-color-light: #58d68d; }
+    .card-categories { --card-color: #f39c12; --card-color-light: #f8c471; }
+    .card-recus { --card-color: #9b59b6; --card-color-light: #bb8fce; }
+    .card-historique { --card-color: #34495e; --card-color-light: #5d6d7e; }
+    
+    /* Badge de notification */
+    .card-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #e74c3c;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        z-index: 2;
+        animation: badge-bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes badge-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    /* Stats rapides */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 3px solid #e8ecf4;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .card-vente-rapide {
+            grid-column: span 1;
+        }
+        
+        .card-vente-rapide .card-icon {
+            font-size: 3.5rem;
+        }
+        
+        .card-vente-rapide .card-title {
+            font-size: 1.8rem;
+        }
+        
+        .dashboard-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+    }
+</style>
 
-<div class="container d-flex flex-wrap justify-content-center gap-3">
+<!-- Section Hero -->
+<div class="hero-section">
+    <h1 class="hero-title">✨ Bienvenue dans Votre Dashboard ✨</h1>
+    <p class="hero-subtitle">Gérez vos ventes avec efficacité et professionnalisme</p>
+</div>
 
-    <a href="{{ url_for('clients') }}" class="btn btn-primary btn-lg d-flex flex-column align-items-center p-3 shadow">
-        <span class="fs-3">👤</span>
-        <span class="d-none d-md-block">Clients</span>
+<!-- Dashboard Grid -->
+<div class="dashboard-grid">
+    
+    <!-- CARTE SPÉCIALE VENTE RAPIDE -->
+    <a href="{{ url_for('vente_rapide') }}" class="dashboard-card card-vente-rapide">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">VENTE RAPIDE</div>
+        <div class="card-subtitle">Interface simplifiée pour vendre en 20 secondes</div>
     </a>
 
-    <a href="{{ url_for('produits') }}" class="btn btn-success btn-lg d-flex flex-column align-items-center p-3 shadow">
-        <span class="fs-3">📦</span>
-        <span class="d-none d-md-block">Produits</span>
+    <!-- Clients -->
+    <a href="{{ url_for('clients') }}" class="dashboard-card card-clients">
+        <div class="card-icon">👥</div>
+        <div class="card-title">Clients</div>
+        <div class="card-subtitle">Gérer votre base clients</div>
     </a>
 
-    <a href="{{ url_for('categories') }}" class="btn btn-warning btn-lg d-flex flex-column align-items-center p-3 shadow">
-        <span class="fs-3">🗂️</span>
-        <span class="d-none d-md-block">Catégories</span>
+    <!-- Produits -->
+    <a href="{{ url_for('produits') }}" class="dashboard-card card-produits">
+        <div class="card-icon">📦</div>
+        <div class="card-title">Produits</div>
+        <div class="card-subtitle">Catalogue de produits</div>
     </a>
 
-    <a href="{{ url_for('ajouter_recu') }}" class="btn btn-info btn-lg d-flex flex-column align-items-center p-3 shadow text-white">
-        <span class="fs-3">📝</span>
-        <span class="d-none d-md-block">Nouveau Reçu</span>
+    <!-- Catégories -->
+    <a href="{{ url_for('categories') }}" class="dashboard-card card-categories">
+        <div class="card-icon">🗂️</div>
+        <div class="card-title">Catégories</div>
+        <div class="card-subtitle">Organiser vos produits</div>
     </a>
 
-    <a href="{{ url_for('tous_les_recus') }}" class="btn btn-dark btn-lg d-flex flex-column align-items-center p-3 shadow">
-        <span class="fs-3">📋</span>
-        <span class="d-none d-md-block">Historique</span>
+    <!-- Nouveau Reçu -->
+    <a href="{{ url_for('ajouter_recu') }}" class="dashboard-card card-recus">
+        <div class="card-icon">📝</div>
+        <div class="card-title">Nouveau Reçu</div>
+        <div class="card-subtitle">Formulaire détaillé</div>
+    </a>
+
+    <!-- Historique -->
+    <a href="{{ url_for('tous_les_recus') }}" class="dashboard-card card-historique">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Historique</div>
+        <div class="card-subtitle">Consulter toutes les ventes</div>
     </a>
 
 </div>
+
+<script>
+    // Animation d'entrée progressive des cartes
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.dashboard-card');
+        
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+    });
+    
+    // Effet de particules sur la carte VENTE RAPIDE
+    const venteRapideCard = document.querySelector('.card-vente-rapide');
+    
+    if (venteRapideCard) {
+        venteRapideCard.addEventListener('mousemove', function(e) {
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            
+            this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px) scale(1.05)`;
+        });
+        
+        venteRapideCard.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    }
+</script>
+
 {% endblock %}

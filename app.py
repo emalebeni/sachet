@@ -4,6 +4,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image, ImageDraw, ImageFont
 import io
+from datetime import datetime
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'votre_cle_secrete'
@@ -363,6 +365,162 @@ def imprimer_recu(recu_id):
     buffer.seek(0)
 
     return send_file(buffer, mimetype='image/png', as_attachment=True, download_name=f"recu_{recu_id}.png")
+
+
+# ==========================================
+# VENTE RAPIDE - Interface Divine
+# ==========================================
+
+@app.route('/vente_rapide')
+def vente_rapide():
+    if not session.get('user_logged_in'):
+        return redirect(url_for('connexion'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Récupérer tous les produits avec leur prix suggéré
+    produits = cursor.execute('''
+        SELECT id, nom, 
+               COALESCE((SELECT prix_unitaire FROM recu_produits 
+                        WHERE produit_id = produits.id 
+                        ORDER BY id DESC LIMIT 1), 0) as prix_suggere
+        FROM produits 
+        ORDER BY nom
+    ''').fetchall()
+    
+    # Statistiques du jour
+    today = datetime.now().strftime('%Y-%m-%d')
+    stats_jour = cursor.execute('''
+        SELECT 
+            COUNT(*) as nb_ventes,
+            COALESCE(SUM(total), 0) as total_jour
+        FROM recu 
+        WHERE DATE(date) = ?
+    ''', (today,)).fetchone()
+    
+    # Top 5 produits du jour
+    top_produits = cursor.execute('''
+        SELECT p.nom, SUM(rp.quantite) as total_vendu
+        FROM recu_produits rp
+        JOIN produits p ON p.id = rp.produit_id
+        JOIN recu r ON r.id = rp.recu_id
+        WHERE DATE(r.date) = ?
+        GROUP BY p.id
+        ORDER BY total_vendu DESC
+        LIMIT 5
+    ''', (today,)).fetchall()
+    
+    conn.close()
+    
+    return render_template('vente_rapide.html', 
+                          produits=produits,
+                          stats_jour=stats_jour,
+                          top_produits=top_produits)
+
+
+# API pour enregistrer une vente rapide
+@app.route('/api/vente_rapide', methods=['POST'])
+def api_vente_rapide():
+    if not session.get('user_logged_in'):
+        return {'error': 'Non autorisé'}, 401
+    
+    try:
+        data = request.get_json()
+        panier = data.get('panier', [])
+        nom_client = data.get('nom_client', 'Client passant')
+        montant_recu = data.get('montant_recu', 0)
+        
+        if not panier:
+            return {'error': 'Panier vide'}, 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Calculer le total
+        total = sum(item['quantite'] * item['prix'] for item in panier)
+        
+        # Créer le reçu
+        cursor.execute('''
+            INSERT INTO recu (client_id, nom_client_temporaire, total, solde)
+            VALUES (NULL, ?, ?, 1)
+        ''', (nom_client, total))
+        
+        recu_id = cursor.lastrowid
+        
+        # Ajouter les produits
+        for item in panier:
+            # Récupérer la première catégorie disponible
+            categorie = cursor.execute('SELECT id FROM categories LIMIT 1').fetchone()
+            categorie_id = categorie[0] if categorie else None
+            
+            if not categorie_id:
+                cursor.execute("INSERT INTO categories (nom) VALUES ('Général')")
+                categorie_id = cursor.lastrowid
+            
+            cursor.execute('''
+                INSERT INTO recu_produits (recu_id, produit_id, quantite, prix_unitaire, categorie_id)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (recu_id, item['produit_id'], item['quantite'], item['prix'], categorie_id))
+        
+        conn.commit()
+        conn.close()
+        
+        # Calculer le rendu
+        rendu = montant_recu - total
+        
+        return {
+            'success': True,
+            'recu_id': recu_id,
+            'total': total,
+            'rendu': rendu
+        }
+        
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+
+# API pour obtenir les stats en temps réel
+@app.route('/api/stats_jour')
+def api_stats_jour():
+    if not session.get('user_logged_in'):
+        return {'error': 'Non autorisé'}, 401
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    today = datetime.now().strftime('%Y-%m-%d')
+    stats = cursor.execute('''
+        SELECT 
+            COUNT(*) as nb_ventes,
+            COALESCE(SUM(total), 0) as total_jour,
+            COUNT(DISTINCT client_id) as nb_clients
+        FROM recu 
+        WHERE DATE(date) = ?
+    ''', (today,)).fetchone()
+    
+    # Dernières 5 ventes
+    dernieres_ventes = cursor.execute('''
+        SELECT id, nom_client_temporaire, total, 
+               strftime('%H:%M', date) as heure, solde
+        FROM recu 
+        WHERE DATE(date) = ?
+        ORDER BY date DESC 
+        LIMIT 5
+    ''', (today,)).fetchall()
+    
+    conn.close()
+    
+    return {
+        'nb_ventes': stats['nb_ventes'],
+        'total_jour': stats['total_jour'],
+        'nb_clients': stats['nb_clients'],
+        'dernieres_ventes': [dict(v) for v in dernieres_ventes]
+    }
+
+# ==========================================
+# FIN VENTE RAPIDE
+# ==========================================
 
 # Lancer l'application
 if __name__ == '__main__':

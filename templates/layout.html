@@ -6,37 +6,258 @@
     <title>{% block title %}Gestion des Reçus{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
         body {
-            background: #f4f6f9;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
         }
+        
+        /* ===== NAVBAR DIVINE ===== */
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 15px 0;
+        }
+        
         .navbar-brand {
-            font-weight: bold;
-            font-size: 1.3rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
         }
-        .dropdown-menu a:hover {
-            background-color: #f8f9fa;
-            color: #000;
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Bouton VENTE RAPIDE spécial */
+        .btn-vente-rapide {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: white !important;
+            font-weight: 700 !important;
+            padding: 10px 25px !important;
+            border-radius: 15px !important;
+            margin: 0 10px;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-vente-rapide::before {
+            content: '⚡';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            transition: left 0.3s ease;
+        }
+        
+        .btn-vente-rapide:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.6);
+        }
+        
+        .btn-vente-rapide:hover::before {
+            left: 10px;
+        }
+        
+        .btn-vente-rapide:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Animation pulsante pour attirer l'attention */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 35px rgba(40, 167, 69, 0.7);
+            }
+        }
+        
+        .btn-vente-rapide {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        /* Navigation links */
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            padding: 8px 15px !important;
+            margin: 0 5px;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .dropdown-menu {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            padding: 10px;
+            margin-top: 10px !important;
+        }
+        
+        .dropdown-item {
+            border-radius: 10px;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        /* Container principal */
+        .container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        /* Alertes stylisées */
+        .alert {
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #2e7d32;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #e65100;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #c62828;
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        /* Bouton déconnexion stylisé */
+        .btn-deconnexion {
+            color: #ff6b6b !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-deconnexion:hover {
+            color: #ff5252 !important;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .btn-vente-rapide {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .navbar-collapse {
+                background: rgba(52, 73, 94, 0.95);
+                padding: 20px;
+                border-radius: 15px;
+                margin-top: 15px;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<!-- NAVBAR DIVINE -->
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('index') }}">📊 Dashboard</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">📊 GESTION PRO</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
                 {% if session.get('user_logged_in') %}
-                    <!-- Si l'utilisateur est connecté -->
+                    <!-- BOUTON VENTE RAPIDE - Star du menu -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('deconnexion') }}">🔒 Déconnexion</a>
+                        <a class="nav-link btn-vente-rapide" href="{{ url_for('vente_rapide') }}">
+                            VENTE RAPIDE
+                        </a>
+                    </li>
+
+                    <!-- Menu Reçus -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuRecu" role="button" 
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            📄 Reçus
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuRecu">
+                            <li><a class="dropdown-item" href="{{ url_for('ajouter_recu') }}">📝 Nouveau reçu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('tous_les_recus') }}">📋 Historique</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Lien Clients -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clients') }}">👥 Clients</a>
+                    </li>
+
+                    <!-- Lien Produits -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('produits') }}">📦 Produits</a>
+                    </li>
+
+                    <!-- Lien Catégories -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('categories') }}">🗂️ Catégories</a>
+                    </li>
+
+                    <!-- Déconnexion -->
+                    <li class="nav-item">
+                        <a class="nav-link btn-deconnexion" href="{{ url_for('deconnexion') }}">🔒 Déconnexion</a>
                     </li>
                 {% else %}
                     <!-- Si l'utilisateur n'est pas connecté -->
@@ -44,59 +265,54 @@
                         <a class="nav-link" href="{{ url_for('connexion') }}">🔑 Connexion</a>
                     </li>
                 {% endif %}
-
-                <!-- Menu déroulant -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="menuRecu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Reçus
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menuRecu">
-                        <li><a class="dropdown-item" href="{{ url_for('ajouter_recu') }}">📝 Nouveau reçu</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('tous_les_recus') }}">📄 Historique</a></li>
-                    </ul>
-                </li>
-
-                <!-- Lien Clients -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('clients') }}">👥 Clients</a>
-                </li>
-
-                <!-- Lien Produits -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('produits') }}">📦 Produits</a>
-                </li>
-
-                <!-- Lien Catégories -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('categories') }}">🗂️ Catégories</a>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
 
 <!-- CONTENU PRINCIPAL -->
-<div class="container mt-4 mb-5">
-    {% with messages = get_flashed_messages() %}
+<div class="container">
+    <!-- Messages Flash stylisés -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
         {% endif %}
     {% endwith %}
 
     {% block content %}{% endblock %}
 </div>
 
-<!-- FOOTER OPTIONNEL -->
-<footer class="text-center text-muted small pb-3">
-    &copy; {{ current_year or "2025" }} - Application de gestion des reçus
+<!-- FOOTER -->
+<footer>
+    &copy; {{ current_year or "2025" }} - Application Professionnelle de Gestion des Reçus
+    <br>
+    <small style="opacity: 0.7;">Développé avec ❤️ pour votre business</small>
 </footer>
 
 <!-- JS Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Animation au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter une animation d'entrée au contenu
+        const container = document.querySelector('.container');
+        if (container) {
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        }
+    });
+</script>
 </body>
 </html>
